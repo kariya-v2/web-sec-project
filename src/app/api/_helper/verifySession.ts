@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/libs/prisma";
+import { getSessionCookieOptions, SESSION_COOKIE_NAME } from "@/app/api/_helper/sessionCookie";
 
 /**
  * Cookie の sessionId から userId を取得（期限延長あり）
@@ -7,7 +8,7 @@ import { prisma } from "@/libs/prisma";
  */
 export const verifySession = async (): Promise<string | null> => {
   const cookieStore = await cookies();
-  const sessionId = cookieStore.get("session_id")?.value;
+  const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
   if (!sessionId) return null;
 
@@ -19,12 +20,8 @@ export const verifySession = async (): Promise<string | null> => {
   if (!session || session.expiresAt <= now) {
     // 無効なセッションは削除 空文字を上書き・有効期限0
     await prisma.session.deleteMany({ where: { id: sessionId } });
-    cookieStore.set("session_id", "", {
-      path: "/",
-      httpOnly: true,
-      sameSite: "lax",
-      maxAge: 0,
-      secure: false, // 本番は true に
+    cookieStore.set(SESSION_COOKIE_NAME, "", {
+      ...getSessionCookieOptions(0),
     });
     return null;
   }
@@ -37,12 +34,8 @@ export const verifySession = async (): Promise<string | null> => {
     data: { expiresAt: newExpiry },
   });
 
-  cookieStore.set("session_id", sessionId, {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    maxAge: tokenMaxAgeSeconds,
-    secure: false,
+  cookieStore.set(SESSION_COOKIE_NAME, sessionId, {
+    ...getSessionCookieOptions(tokenMaxAgeSeconds),
   });
 
   return session.userId;

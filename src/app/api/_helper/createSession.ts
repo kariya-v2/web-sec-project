@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/libs/prisma";
+import { getSessionCookieOptions, SESSION_COOKIE_NAME } from "@/app/api/_helper/sessionCookie";
 
 /**
  * セッションを新規作成して Cookie に設定する。
@@ -23,13 +24,8 @@ export const createSession = async (
   });
 
   const cookieStore = await cookies();
-  // 💀 session_id というクッキー名が典型的すぎて狙われやすい（XSSでの標的）
-  cookieStore.set("session_id", session.id, {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    maxAge: tokenMaxAgeSeconds,
-    secure: false, // 💀 secure: false は開発用。deploy 時は要切替！
+  cookieStore.set(SESSION_COOKIE_NAME, session.id, {
+    ...getSessionCookieOptions(tokenMaxAgeSeconds),
   });
 
   return session.id;

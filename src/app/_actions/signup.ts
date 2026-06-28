@@ -1,5 +1,6 @@
 "use server";
 
+import bcrypt from "bcryptjs";
 import { prisma } from "@/libs/prisma";
 import { signupRequestSchema } from "@/app/_types/SignupRequest";
 import { userProfileSchema } from "@/app/_types/UserProfile";
@@ -34,9 +35,7 @@ export const signupServerAction = async (
     }
 
     // パスワードのハッシュ化
-    // 💀 ハッシュ化せずにPW保存（ダメ絶対）
-    const hashedPassword = payload.password;
-    // const hashedPassword = await bcrypt.hash(payload.password, 10);
+    const hashedPassword = await bcrypt.hash(payload.password, 12);
 
     // ユーザの作成
     const user = await prisma.user.create({

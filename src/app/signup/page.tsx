@@ -16,6 +16,7 @@ import { faSpinner, faPenNib } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { signupServerAction } from "@/app/_actions/signup";
+import { PasswordStrengthMeter } from "@/app/_components/PasswordStrengthMeter";
 
 const Page: React.FC = () => {
   const c_Name = "name";
@@ -24,15 +25,15 @@ const Page: React.FC = () => {
 
   const router = useRouter();
 
-  const [isPending, startTransition] = useTransition();
-  const [isSignUpCompleted, setIsSignUpCompleted] = useState(false);
-
   // フォーム処理関連の準備と設定
   const formMethods = useForm<SignupRequest>({
     mode: "onChange",
     resolver: zodResolver(signupRequestSchema),
   });
   const fieldErrors = formMethods.formState.errors;
+  const [isPending, startTransition] = useTransition();
+  const [isSignUpCompleted, setIsSignUpCompleted] = useState(false);
+  const password = formMethods.watch(c_Password) ?? "";
 
   // ルートエラー（サーバサイドで発生した認証エラー）の表示設定の関数
   const setRootError = (errorMsg: string) => {
@@ -138,6 +139,7 @@ const Page: React.FC = () => {
             error={!!fieldErrors.password}
             autoComplete="off"
           />
+          <PasswordStrengthMeter password={password} />
           <ErrorMsgField msg={fieldErrors.password?.message} />
           <ErrorMsgField msg={fieldErrors.root?.message} />
         </div>

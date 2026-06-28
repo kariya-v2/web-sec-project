@@ -4,6 +4,7 @@ import { useAuth } from "@/app/_hooks/useAuth";
 import NextLink from "next/link";
 
 import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChalkboardUser } from "@fortawesome/free-solid-svg-icons";
 
@@ -13,6 +14,24 @@ import { AUTH } from "@/config/auth";
 export const Header: React.FC = () => {
   const { userProfile, logout } = useAuth();
   const router = useRouter();
+
+  const handleDeleteAccount = useCallback(async () => {
+    const confirmed = window.confirm("本当に退会しますか？この操作は取り消せません。");
+    if (!confirmed) return;
+
+    const res = await fetch("/api/account", {
+      method: "DELETE",
+      credentials: "same-origin",
+    });
+
+    if (!res.ok) {
+      window.alert("退会に失敗しました。もう一度お試しください。" );
+      return;
+    }
+
+    await logout();
+    router.push("/");
+  }, [logout, router]);
 
   return (
     <header>
@@ -42,6 +61,12 @@ export const Header: React.FC = () => {
                   onClick={logout}
                 >
                   ログアウト
+                </div>
+                <div
+                  className={twMerge("cursor-pointer hover:text-rose-300")}
+                  onClick={handleDeleteAccount}
+                >
+                  退会
                 </div>
               </div>
             </div>

@@ -2,7 +2,7 @@
 import { createHash } from "crypto";
 
 const main = async () => {
-  const pw1 = "password";
+  const pw1 = "df03dc88fb6b92fc61cf1da4338acb8816f7bf43bceb2d8a280e0c32d96852aa";
   const pw2 = "passworD";
   const pw3 = "Password-Password-Password";
 

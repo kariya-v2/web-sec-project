@@ -38,6 +38,14 @@ const main = async () => {
       aboutSlug: "aimaiko",
       aboutContent: "仕様曖昧子と申します。仲良くしてください。",
     },
+    {
+      name: "AI 正聖子",
+      password: "password2222",
+      email: "user03@example.com",
+      role: Role.USER,
+      aboutSlug: "seiseiko",
+      aboutContent: "戦争とあなたが嫌いです。仲良くしてください。",
+    },
   ];
 
   // userSeedSchema を使って UserSeeds のバリデーション
@@ -105,6 +113,11 @@ const main = async () => {
         name: "	パワポで月収100万：架空案件で学ぶ「営業芸」完全読本",
         price: 15000,
       },
+      {
+        id: "A-005",
+        name: "	光バイトで自給5万!立ってるだけ!",
+        price: 10000,
+      },
     ],
   });
 
@@ -152,6 +165,12 @@ const main = async () => {
           "リアルタイムOSが「うちなータイム」に感化されてスケジューラが瞑想状態に",
         region: Region.OKINAWA,
         publishedAt: new Date("2025-05-22"),
+      },
+      {
+        title:
+          "うおおおおおおおおおお！！！",
+        region: Region.OKINAWA,
+        publishedAt: new Date("2025-05-21"),
       },
     ],
   });

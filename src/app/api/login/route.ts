@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { prisma } from "@/libs/prisma";
 import { loginRequestSchema } from "@/app/_types/LoginRequest";
 import { userProfileSchema } from "@/app/_types/UserProfile";
@@ -5,7 +6,6 @@ import type { UserProfile } from "@/app/_types/UserProfile";
 import type { ApiResponse } from "@/app/_types/ApiResponse";
 import { NextResponse, NextRequest } from "next/server";
 import { createSession } from "@/app/api/_helper/createSession";
-import { createJwt } from "@/app/api/_helper/createJwt";
 import { AUTH } from "@/config/auth";
 
 // キャッシュを無効化して毎回最新情報を取得
@@ -41,8 +41,10 @@ export const POST = async (req: NextRequest) => {
     }
 
     // パスワードの検証
-    // ✍ bcrypt でハッシュ化したパスワードを検証するように書き換えよ。
-    const isValidPassword = user.password === loginRequest.password;
+    const isValidPassword = await bcrypt.compare(
+      loginRequest.password,
+      user.password,
+    );
     if (!isValidPassword) {
       const res: ApiResponse<null> = {
         success: false,
@@ -55,25 +57,13 @@ export const POST = async (req: NextRequest) => {
 
     const tokenMaxAgeSeconds = 60 * 60 * 3; // 3時間
 
-    if (AUTH.isSession) {
-      // ■■ セッションベース認証の処理 ■■
-      await createSession(user.id, tokenMaxAgeSeconds);
-      const res: ApiResponse<UserProfile> = {
-        success: true,
-        payload: userProfileSchema.parse(user), // 余分なプロパティを削除
-        message: "",
-      };
-      return NextResponse.json(res);
-    } else {
-      // ■■ トークンベース認証の処理 ■■
-      const jwt = await createJwt(user, tokenMaxAgeSeconds);
-      const res: ApiResponse<string> = {
-        success: true,
-        payload: jwt,
-        message: "",
-      };
-      return NextResponse.json(res);
-    }
+    await createSession(user.id, tokenMaxAgeSeconds);
+    const res: ApiResponse<UserProfile> = {
+      success: true,
+      payload: userProfileSchema.parse(user), // 余分なプロパティを削除
+      message: "",
+    };
+    return NextResponse.json(res);
   } catch (e) {
     const errorMsg = e instanceof Error ? e.message : "Internal Server Error";
     console.error(errorMsg);
