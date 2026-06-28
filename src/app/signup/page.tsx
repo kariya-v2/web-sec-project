@@ -12,7 +12,7 @@ import { ErrorMsgField } from "@/app/_components/ErrorMsgField";
 import { Button } from "@/app/_components/Button";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { faSpinner, faPenNib } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash, faSpinner, faPenNib } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { signupServerAction } from "@/app/_actions/signup";
@@ -32,6 +32,7 @@ const Page: React.FC = () => {
   const fieldErrors = formMethods.formState.errors;
   const [isPending, startTransition] = useTransition();
   const [isSignUpCompleted, setIsSignUpCompleted] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const password = formMethods.watch(c_Password) ?? "";
 
   const setRootError = (errorMsg: string) => {
@@ -129,16 +130,25 @@ const Page: React.FC = () => {
             <label htmlFor={c_Password} className="font-semibold text-slate-700 dark:text-slate-200">
               パスワード
             </label>
-            <TextInputField
-              {...passwordRegister}
-              onChange={clearRootOnChange(onPasswordChange)}
-              id={c_Password}
-              placeholder="*****"
-              type="password"
-              disabled={isPending || isSignUpCompleted}
-              error={!!fieldErrors.password}
-              autoComplete="off"
-            />
+            <div className="relative">
+              <TextInputField
+                {...passwordRegister}
+                onChange={clearRootOnChange(onPasswordChange)}
+                id={c_Password}
+                placeholder="*****"
+                type={isPasswordVisible ? "text" : "password"}
+                disabled={isPending || isSignUpCompleted}
+                error={!!fieldErrors.password}
+                autoComplete="off"
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-slate-100 px-2 py-1 text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                onClick={() => setIsPasswordVisible((prev) => !prev)}
+              >
+                <FontAwesomeIcon icon={isPasswordVisible ? faEyeSlash : faEye} />
+              </button>
+            </div>
             <PasswordStrengthMeter password={password} />
             <ErrorMsgField msg={fieldErrors.password?.message} />
             <ErrorMsgField msg={fieldErrors.root?.message} />
