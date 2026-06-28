@@ -73,7 +73,7 @@
 3. プロフィール画面: 認証済み情報表示
 4. 退会確認画面: 退会処理
 
-[![動画のタイトル](https://img.youtube.com/vi/動画ID/0.jpg)](https://www.youtube.com/watch?v=KcNORTqldoM)
+[![デモンストレーションの動画リンク](https://img.youtube.com/vi/動画ID/0.jpg)](https://www.youtube.com/watch?v=KcNORTqldoM)
 
 ## 6. セットアップ手順
 
