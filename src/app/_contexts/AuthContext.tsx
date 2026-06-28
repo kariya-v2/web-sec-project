@@ -9,6 +9,7 @@ import { sessionFetcher } from "./sessionFetcher";
 interface AuthContextProps {
   userProfile: UserProfile | null;
   logout: () => Promise<boolean>;
+  isLoading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextProps | undefined>(
@@ -20,7 +21,7 @@ interface Props {
 }
 
 const AuthProvider: React.FC<Props> = ({ children }) => {
-  const { data: session } = useSWR<ApiResponse<UserProfile | null>>(
+  const { data: session, isLoading } = useSWR<ApiResponse<UserProfile | null>>(
     "/api/auth",
     sessionFetcher,
   );
@@ -42,7 +43,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ userProfile, logout }}>
+    <AuthContext.Provider value={{ userProfile, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

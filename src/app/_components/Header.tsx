@@ -8,9 +8,6 @@ import { useCallback } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChalkboardUser } from "@fortawesome/free-solid-svg-icons";
 
-import { twMerge } from "tailwind-merge";
-import { AUTH } from "@/config/auth";
-
 export const Header: React.FC = () => {
   const { userProfile, logout } = useAuth();
   const router = useRouter();
@@ -25,7 +22,7 @@ export const Header: React.FC = () => {
     });
 
     if (!res.ok) {
-      window.alert("退会に失敗しました。もう一度お試しください。" );
+      window.alert("退会に失敗しました。もう一度お試しください。");
       return;
     }
 
@@ -34,54 +31,44 @@ export const Header: React.FC = () => {
   }, [logout, router]);
 
   return (
-    <header>
-      <div className="bg-slate-800 py-2">
-        <div
-          className={twMerge(
-            "mx-4 max-w-3xl md:mx-auto",
-            "flex items-center justify-between",
-            "text-lg font-bold text-white",
-          )}
+    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur-md dark:border-slate-700 dark:bg-slate-950/95">
+      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 md:px-6">
+        <NextLink
+          href="/"
+          className="flex items-center gap-3 text-lg font-bold text-slate-900 transition hover:text-slate-700 dark:text-slate-100 dark:hover:text-slate-50"
         >
-          <div>
-            <NextLink href="/">
-              <FontAwesomeIcon icon={faChalkboardUser} className="mr-1.5" />
-              WebSecPlayground
-            </NextLink>
-            <span className="ml-1 text-xs font-normal">
-              {AUTH.isSession ? "- Session Auth" : "- JWT Auth"}
-            </span>
-          </div>
+          <FontAwesomeIcon icon={faChalkboardUser} className="text-indigo-500" />
+          <span>WebSecPlayground</span>
+          <span className="text-sm font-normal text-slate-500 dark:text-slate-400">セッション認証</span>
+        </NextLink>
+
+        <div className="flex items-center gap-2 text-sm">
           {userProfile ? (
-            <div className="ml-2 text-sm text-slate-400">
-              <div className="flex items-center gap-x-2">
-                <div className="text-slate-200">{userProfile.name}</div>
-                <div
-                  className={twMerge("cursor-pointer hover:text-white")}
-                  onClick={logout}
-                >
-                  ログアウト
-                </div>
-                <div
-                  className={twMerge("cursor-pointer hover:text-rose-300")}
-                  onClick={handleDeleteAccount}
-                >
-                  退会
-                </div>
-              </div>
+            <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+              <span>{userProfile.name}</span>
+              <button
+                type="button"
+                className="rounded-full px-3 py-1 text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                onClick={logout}
+              >
+                ログアウト
+              </button>
+              <button
+                type="button"
+                className="rounded-full bg-rose-500 px-3 py-1 text-white transition hover:bg-rose-600"
+                onClick={handleDeleteAccount}
+              >
+                退会
+              </button>
             </div>
           ) : (
-            <div
-              className={twMerge(
-                "ml-2 text-sm text-slate-400",
-                "cursor-pointer hover:text-white",
-              )}
-              onClick={() => {
-                router.push("/login");
-              }}
+            <button
+              type="button"
+              className="rounded-full border border-slate-300 bg-white px-4 py-1.5 text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800"
+              onClick={() => router.push("/login")}
             >
               ログイン
-            </div>
+            </button>
           )}
         </div>
       </div>

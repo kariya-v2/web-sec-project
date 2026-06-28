@@ -25,14 +25,12 @@ const Page: React.FC = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoginCompleted, setIsLoginCompleted] = useState(false);
 
-  // フォーム処理関連の準備と設定
   const formMethods = useForm<LoginRequest>({
     mode: "onChange",
     resolver: zodResolver(loginRequestSchema),
   });
   const fieldErrors = formMethods.formState.errors;
 
-  // ルートエラー（サーバサイドで発生した認証エラー）の表示設定の関数
   const setRootError = (errorMsg: string) => {
     formMethods.setError("root", {
       type: "manual",
@@ -40,24 +38,21 @@ const Page: React.FC = () => {
     });
   };
 
-  // 初期設定
   useEffect(() => {
-    // クエリパラメータからメールアドレスの初期値をセット
     const searchParams = new URLSearchParams(window.location.search);
     const email = searchParams.get(c_Email);
-    formMethods.setValue(c_Email, email || "");
+    if (email) {
+      formMethods.setValue(c_Email, email);
+    }
   }, [formMethods]);
 
-  // ログイン完了後のリダイレクト処理
   useEffect(() => {
     if (isLoginCompleted) {
-      // window.location.href = "/";
       router.replace("/");
       router.refresh();
     }
   }, [isLoginCompleted, router]);
 
-  // ルートエラーのクリア用 onChange ハンドラ合成
   const { onChange: onEmailChange, ...emailRegister } = formMethods.register(c_Email);
   const { onChange: onPasswordChange, ...passwordRegister } = formMethods.register(c_Password);
   const clearRootOnChange =
@@ -67,11 +62,9 @@ const Page: React.FC = () => {
       formMethods.clearErrors("root");
     };
 
-  // フォームの送信処理
   const onSubmit = async (formValues: LoginRequest) => {
     const ep = "/api/login";
 
-    console.log(JSON.stringify(formValues));
     try {
       setIsPending(true);
       setRootError("");
@@ -100,81 +93,87 @@ const Page: React.FC = () => {
       const errorMsg =
         e instanceof Error ? e.message : "予期せぬエラーが発生しました。";
       setRootError(errorMsg);
+      setIsPending(false);
     }
   };
 
   return (
-    <main>
-      <div className="text-2xl font-bold">
-        <FontAwesomeIcon icon={faRightToBracket} className="mr-1.5" />
-        Login
-      </div>
-      <form
-        noValidate
-        onSubmit={formMethods.handleSubmit(onSubmit)}
-        className={twMerge(
-          "mt-4 flex flex-col gap-y-4",
-          isLoginCompleted && "cursor-not-allowed opacity-50",
-        )}
-      >
-        <div>
-          <label htmlFor={c_Email} className="mb-2 block font-bold">
-            メールアドレス（ログインID）
-          </label>
-          <TextInputField
-            {...emailRegister}
-            onChange={clearRootOnChange(onEmailChange)}
-            id={c_Email}
-            placeholder="name@example.com"
-            type="email"
-            disabled={isPending || isLoginCompleted}
-            error={!!fieldErrors.email}
-            autoComplete="email"
-          />
-          <ErrorMsgField msg={fieldErrors.email?.message} />
+    <main className="space-y-6">
+      <section className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <div className="flex items-center gap-3 text-2xl font-bold">
+          <FontAwesomeIcon icon={faRightToBracket} className="text-indigo-600" />
+          <span>ログイン</span>
         </div>
+        <p className="mt-3 text-slate-600 dark:text-slate-400">
+          登録済みのアカウントでログインして、メンバーコンテンツにアクセスします。
+        </p>
+      </section>
 
-        <div>
-          <label htmlFor={c_Password} className="mb-2 block font-bold">
-            パスワード
-          </label>
-          <TextInputField
-            {...passwordRegister}
-            onChange={clearRootOnChange(onPasswordChange)}
-            id={c_Password}
-            placeholder="*****"
-            type="password"
-            disabled={isPending || isLoginCompleted}
-            error={!!fieldErrors.password}
-            autoComplete="off"
-          />
-          <ErrorMsgField msg={fieldErrors.password?.message} />
-          <ErrorMsgField msg={fieldErrors.root?.message} />
-        </div>
-
-        <Button
-          variant="indigo"
-          width="stretch"
-          className={twMerge("tracking-widest")}
-          isBusy={isPending}
-          disabled={
-            !formMethods.formState.isValid || isPending || isLoginCompleted
-          }
+      <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-950">
+        <form
+          noValidate
+          onSubmit={formMethods.handleSubmit(onSubmit)}
+          className="grid gap-5"
         >
-          ログイン
-        </Button>
-      </form>
+          <div className="grid gap-2">
+            <label htmlFor={c_Email} className="font-semibold text-slate-700 dark:text-slate-200">
+              メールアドレス（ログインID）
+            </label>
+            <TextInputField
+              {...emailRegister}
+              onChange={clearRootOnChange(onEmailChange)}
+              id={c_Email}
+              placeholder="name@example.com"
+              type="email"
+              disabled={isPending || isLoginCompleted}
+              error={!!fieldErrors.email}
+              autoComplete="email"
+            />
+            <ErrorMsgField msg={fieldErrors.email?.message} />
+          </div>
+
+          <div className="grid gap-2">
+            <label htmlFor={c_Password} className="font-semibold text-slate-700 dark:text-slate-200">
+              パスワード
+            </label>
+            <TextInputField
+              {...passwordRegister}
+              onChange={clearRootOnChange(onPasswordChange)}
+              id={c_Password}
+              placeholder="*****"
+              type="password"
+              disabled={isPending || isLoginCompleted}
+              error={!!fieldErrors.password}
+              autoComplete="off"
+            />
+            <ErrorMsgField msg={fieldErrors.password?.message} />
+            <ErrorMsgField msg={fieldErrors.root?.message} />
+          </div>
+
+          <Button
+            variant="indigo"
+            width="stretch"
+            className="tracking-widest"
+            isBusy={isPending}
+            disabled={
+              !formMethods.formState.isValid || isPending || isLoginCompleted
+            }
+          >
+            ログイン
+          </Button>
+        </form>
+      </section>
 
       {isLoginCompleted && (
-        <div>
-          <div className="mt-4 flex items-center gap-x-2">
-            <FontAwesomeIcon icon={faSpinner} spin />
-            <div>ようこそ、{userProfile?.name} さん。</div>
+        <section className="rounded-[1.75rem] border border-indigo-200 bg-indigo-50 p-5 text-slate-700 dark:border-indigo-500/20 dark:bg-slate-900/80 dark:text-slate-100">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <FontAwesomeIcon icon={faSpinner} spin className="text-indigo-500" />
+            <span>ログインしました。ホーム画面へ移動します。</span>
           </div>
-          <NextLink href="/" className="text-blue-500 hover:underline">
-            自動的に画面が切り替わらないときはこちらをクリックしてください。
+          <NextLink href="/" className="mt-3 inline-block text-indigo-700 hover:underline dark:text-indigo-300">
+            自動的に移動しない場合はこちら
           </NextLink>
-        </div>
+        </section>
       )}
     </main>
   );

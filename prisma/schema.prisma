@@ -26,36 +26,35 @@ enum Region {
 }
 
 model User {
-  id           String      @id @default(uuid())
-  email        String      @unique
-  password     String
-  name         String
-  role         Role        @default(USER)
-  aboutSlug    String?     @map("about_slug") @unique
-  aboutContent String      @default("") 
-  createdAt    DateTime    @default(now()) @map("created_at")
-  updatedAt    DateTime    @updatedAt @map("updated_at")
-  lastLoginAt  DateTime?   @map("last_login_at")
+  id          String    @id @default(uuid())
+  email       String    @unique
+  password    String
+  name        String
+  role        Role      @default(USER)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  lastLoginAt DateTime? @map("last_login_at")
 
-  sessions     Session[]
+  sessions Session[]
 
   @@map("users")
 }
 
 model Session {
-  id         String    @id @default(uuid())
-  userId     String    @map("user_id")
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt  DateTime  @default(now()) @map("created_at")
-  expiresAt  DateTime  @map("expires_at")
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  expiresAt DateTime @map("expires_at")
 
   @@map("sessions")
 }
 
 model StolenContent {
-  id          String    @id @default(uuid())
-  content     String
-  createdAt   DateTime  @default(now()) @map("created_at")
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
   @@map("stolen_contents")
 }
 
@@ -66,37 +65,38 @@ model NewsItem {
   region      Region
   publishedAt DateTime @default(now()) @map("published_at")
 
-  @@map("news")
   @@index([region])
+  @@map("news")
 }
 
 model Product {
-  id          String   @id
-  name        String
-  price       Int
-  CartItem    CartItem[]  
+  id       String     @id
+  name     String
+  price    Int
+  CartItem CartItem[]
+
   @@map("products")
 }
 
-model CartSession{
-  id         String    @id @default(uuid())
-  expiresAt  DateTime  @map("expires_at")
-  CartItem   CartItem[]
+model CartSession {
+  id        String     @id @default(uuid())
+  expiresAt DateTime   @map("expires_at")
+  CartItem  CartItem[]
 
   @@index([expiresAt]) // 有効期限切れの高速検索用
   @@map("cart_sessions")
 }
 
 model CartItem {
-  id            String  @id @default(uuid())
-  cartSessionId String  @map("cart_session_id")
-  productId     String  @map("product_id")
+  id            String @id @default(uuid())
+  cartSessionId String @map("cart_session_id")
+  productId     String @map("product_id")
   quantity      Int
 
-  CartSession   CartSession @relation(fields: [cartSessionId], references: [id], onDelete: Cascade)
-  Product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  CartSession CartSession @relation(fields: [cartSessionId], references: [id], onDelete: Cascade)
+  Product     Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@index([cartSessionId])
   @@unique([cartSessionId, productId])
+  @@index([cartSessionId])
   @@map("cart_items")
 }

@@ -27,24 +27,18 @@ const main = async () => {
       password: "password1111",
       email: "user01@example.com",
       role: Role.USER,
-      aboutSlug: "gojiro",
-      aboutContent: "構文誤次郎です。<br>よろしくお願いします。",
     },
     {
       name: "仕様 曖昧子",
       password: "password2222",
       email: "user02@example.com",
       role: Role.USER,
-      aboutSlug: "aimaiko",
-      aboutContent: "仕様曖昧子と申します。仲良くしてください。",
     },
     {
       name: "AI 正聖子",
       password: "password2222",
       email: "user03@example.com",
       role: Role.USER,
-      aboutSlug: "seiseiko",
-      aboutContent: "戦争とあなたが嫌いです。仲良くしてください。",
     },
   ];
 
@@ -85,8 +79,6 @@ const main = async () => {
       password: userSeed.password,
       role: userSeed.role,
       email: userSeed.email,
-      aboutSlug: userSeed.aboutSlug || null,
-      aboutContent: userSeed.aboutContent || "",
     })),
   });
 

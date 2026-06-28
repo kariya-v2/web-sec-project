@@ -25,7 +25,6 @@ const Page: React.FC = () => {
 
   const router = useRouter();
 
-  // フォーム処理関連の準備と設定
   const formMethods = useForm<SignupRequest>({
     mode: "onChange",
     resolver: zodResolver(signupRequestSchema),
@@ -35,7 +34,6 @@ const Page: React.FC = () => {
   const [isSignUpCompleted, setIsSignUpCompleted] = useState(false);
   const password = formMethods.watch(c_Password) ?? "";
 
-  // ルートエラー（サーバサイドで発生した認証エラー）の表示設定の関数
   const setRootError = (errorMsg: string) => {
     formMethods.setError("root", {
       type: "manual",
@@ -43,7 +41,6 @@ const Page: React.FC = () => {
     });
   };
 
-  // ルートエラーのクリア用 onChange ハンドラ合成
   const { onChange: onEmailChange, ...emailRegister } = formMethods.register(c_Email);
   const { onChange: onPasswordChange, ...passwordRegister } = formMethods.register(c_Password);
   const clearRootOnChange =
@@ -53,20 +50,16 @@ const Page: React.FC = () => {
       formMethods.clearErrors("root");
     };
 
-  // サインアップ完了後のリダイレクト処理
   useEffect(() => {
     if (isSignUpCompleted) {
       router.replace(`/login?${c_Email}=${formMethods.getValues(c_Email)}`);
       router.refresh();
-      console.log("サインアップ完了");
     }
   }, [formMethods, isSignUpCompleted, router]);
 
-  // フォームの送信処理
   const onSubmit = async (signupRequest: SignupRequest) => {
     try {
       startTransition(async () => {
-        // ServerAction (Custom Invocation) の利用
         const res = await signupServerAction(signupRequest);
         if (!res.success) {
           setRootError(res.message);
@@ -82,96 +75,101 @@ const Page: React.FC = () => {
   };
 
   return (
-    <main>
-      <div className="text-2xl font-bold">
-        <FontAwesomeIcon icon={faPenNib} className="mr-1.5" />
-        Signup
-      </div>
-      <form
-        noValidate
-        onSubmit={formMethods.handleSubmit(onSubmit)}
-        className="mt-4 flex flex-col gap-y-4"
-      >
-        <div>
-          <label htmlFor={c_Name} className="mb-2 block font-bold">
-            表示名
-          </label>
-          <TextInputField
-            {...formMethods.register(c_Name)}
-            id={c_Name}
-            placeholder="寝屋川 タヌキ"
-            type="text"
-            disabled={isPending || isSignUpCompleted}
-            error={!!fieldErrors.name}
-            autoComplete="name"
-          />
-          <ErrorMsgField msg={fieldErrors.name?.message} />
+    <main className="space-y-6">
+      <section className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <div className="flex items-center gap-3 text-2xl font-bold">
+          <FontAwesomeIcon icon={faPenNib} className="text-indigo-600" />
+          <span>新規登録</span>
         </div>
+        <p className="mt-3 text-slate-600 dark:text-slate-400">
+          新しいアカウントを作成して、セッションベース認証機能を体験できます。
+        </p>
+      </section>
 
-        <div>
-          <label htmlFor={c_Email} className="mb-2 block font-bold">
-            メールアドレス（ログインID）
-          </label>
-          <TextInputField
-            {...emailRegister}
-            onChange={clearRootOnChange(onEmailChange)}
-            id={c_Email}
-            placeholder="name@example.com"
-            type="email"
-            disabled={isPending || isSignUpCompleted}
-            error={!!fieldErrors.email}
-            autoComplete="email"
-          />
-          <ErrorMsgField msg={fieldErrors.email?.message} />
-        </div>
-
-        <div>
-          <label htmlFor={c_Password} className="mb-2 block font-bold">
-            パスワード
-          </label>
-          <TextInputField
-            {...passwordRegister}
-            onChange={clearRootOnChange(onPasswordChange)}
-            id={c_Password}
-            placeholder="*****"
-            type="password"
-            disabled={isPending || isSignUpCompleted}
-            error={!!fieldErrors.password}
-            autoComplete="off"
-          />
-          <PasswordStrengthMeter password={password} />
-          <ErrorMsgField msg={fieldErrors.password?.message} />
-          <ErrorMsgField msg={fieldErrors.root?.message} />
-        </div>
-
-        <Button
-          variant="indigo"
-          width="stretch"
-          className="tracking-widest"
-          isBusy={isPending}
-          disabled={
-            !formMethods.formState.isValid ||
-            isPending ||
-            isSignUpCompleted
-          }
+      <section className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-950">
+        <form
+          noValidate
+          onSubmit={formMethods.handleSubmit(onSubmit)}
+          className="grid gap-5"
         >
-          登録
-        </Button>
-      </form>
+          <div className="grid gap-2">
+            <label htmlFor={c_Name} className="font-semibold text-slate-700 dark:text-slate-200">
+              表示名
+            </label>
+            <TextInputField
+              {...formMethods.register(c_Name)}
+              id={c_Name}
+              placeholder="寝屋川 タヌキ"
+              type="text"
+              disabled={isPending || isSignUpCompleted}
+              error={!!fieldErrors.name}
+              autoComplete="name"
+            />
+            <ErrorMsgField msg={fieldErrors.name?.message} />
+          </div>
+
+          <div className="grid gap-2">
+            <label htmlFor={c_Email} className="font-semibold text-slate-700 dark:text-slate-200">
+              メールアドレス（ログインID）
+            </label>
+            <TextInputField
+              {...emailRegister}
+              onChange={clearRootOnChange(onEmailChange)}
+              id={c_Email}
+              placeholder="name@example.com"
+              type="email"
+              disabled={isPending || isSignUpCompleted}
+              error={!!fieldErrors.email}
+              autoComplete="email"
+            />
+            <ErrorMsgField msg={fieldErrors.email?.message} />
+          </div>
+
+          <div className="grid gap-2">
+            <label htmlFor={c_Password} className="font-semibold text-slate-700 dark:text-slate-200">
+              パスワード
+            </label>
+            <TextInputField
+              {...passwordRegister}
+              onChange={clearRootOnChange(onPasswordChange)}
+              id={c_Password}
+              placeholder="*****"
+              type="password"
+              disabled={isPending || isSignUpCompleted}
+              error={!!fieldErrors.password}
+              autoComplete="off"
+            />
+            <PasswordStrengthMeter password={password} />
+            <ErrorMsgField msg={fieldErrors.password?.message} />
+            <ErrorMsgField msg={fieldErrors.root?.message} />
+          </div>
+
+          <Button
+            variant="indigo"
+            width="stretch"
+            className="tracking-widest"
+            isBusy={isPending}
+            disabled={
+              !formMethods.formState.isValid ||
+              isPending ||
+              isSignUpCompleted
+            }
+          >
+            登録
+          </Button>
+        </form>
+      </section>
 
       {isSignUpCompleted && (
-        <div>
-          <div className="mt-4 flex items-center gap-x-2">
-            <FontAwesomeIcon icon={faSpinner} spin />
-            <div>サインアップが完了しました。ログインページに移動します。</div>
+        <section className="rounded-[1.75rem] border border-indigo-200 bg-indigo-50 p-5 text-slate-700 dark:border-indigo-500/20 dark:bg-slate-900/80 dark:text-slate-100">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <FontAwesomeIcon icon={faSpinner} spin className="text-indigo-500" />
+            <span>サインアップが完了しました。ログインページへ移動します。</span>
           </div>
-          <NextLink
-            href={`/login?${c_Email}=${formMethods.getValues(c_Email)}`}
-            className="text-blue-500 hover:underline"
-          >
-            自動的に画面が切り替わらないときはこちらをクリックしてください。
+          <NextLink href={`/login?${c_Email}=${formMethods.getValues(c_Email)}`} className="mt-3 inline-block text-indigo-700 hover:underline dark:text-indigo-300">
+            自動的に画面が切り替わらない場合はこちら
           </NextLink>
-        </div>
+        </section>
       )}
     </main>
   );

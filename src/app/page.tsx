@@ -1,72 +1,53 @@
 import NextLink from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCode, faIdCard } from "@fortawesome/free-solid-svg-icons";
-import { prisma } from "@/libs/prisma";
-
-export const dynamic = "force-dynamic";
+import { faCode, faUser } from "@fortawesome/free-solid-svg-icons";
 
 const links = [
   {
     href: "/login",
     label: "ログイン",
-    info: "セッションベース認証入門/トークンベース認証入門",
+    info: "登録済みユーザー用の認証ページです",
   },
   {
     href: "/signup",
     label: "サインアップ",
-    info: "ServerActions (Custom Invocation) 入門",
+    info: "新規ユーザー登録ページです",
   },
   {
     href: "/member/about",
-    label: "公開プロフィールの確認・編集",
-    info: "ログインが必要なコンテンツ",
+    label: "プロフィール確認",
+    info: "ログイン済みユーザーのみアクセス可能です",
   },
 ];
 
-const Page = async () => {
-  const publicProfiles = await prisma.user.findMany({
-    where: { aboutSlug: { not: null } },
-    select: { name: true, aboutSlug: true },
-    orderBy: { name: "asc" },
-  });
-
+const Page = () => {
   return (
-    <main>
-      <div className="text-2xl font-bold">Main</div>
-      <div className="mt-4 ml-2 gap-y-2">
-        {links.map(({ href, label, info }) => (
-          <div key={href} className="flex items-center">
-            <FontAwesomeIcon icon={faCode} className="mr-1.5" />
-            <NextLink href={href} className="mr-2 hover:underline">
-              {label}
-            </NextLink>
-            <div className="text-xs text-slate-600">※ {info}</div>
-          </div>
-        ))}
-      </div>
+    <main className="space-y-8">
+      <section className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <div className="flex items-center gap-3 text-3xl font-bold text-slate-900 dark:text-slate-100">
+          <FontAwesomeIcon icon={faUser} className="text-indigo-600" />
+          <span>WebSecPlayground</span>
+        </div>
+        <p className="mt-3 max-w-2xl text-slate-600 dark:text-slate-300">
+          このアプリは、セッション認証と認可を中心にしたシンプルな機能構成です。ログイン後にプロフィール確認画面へアクセスできます。
+        </p>
+      </section>
 
-      <div className="mt-6 text-lg font-bold">公開プロフィール</div>
-      <div className="mt-2 ml-2 gap-y-2">
-        {publicProfiles.length === 0 ? (
-          <div className="text-sm text-slate-400">
-            公開プロフィールはまだありません。ログインして /member/about
-            でスラグを設定してください。
-          </div>
-        ) : (
-          publicProfiles.map(({ name, aboutSlug }) => (
-            <div key={aboutSlug} className="flex items-center">
-              <FontAwesomeIcon icon={faIdCard} className="mr-1.5" />
-              <NextLink
-                href={`/about/${aboutSlug}`}
-                className="mr-2 hover:underline"
-              >
-                {name} のプロフィール
-              </NextLink>
-              <div className="text-xs text-rose-400">※ XSS脆弱性（蓄積型）</div>
+      <section className="grid gap-4 sm:grid-cols-3">
+        {links.map(({ href, label, info }) => (
+          <NextLink
+            key={href}
+            href={href}
+            className="rounded-3xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-950"
+          >
+            <div className="flex items-center gap-3 text-lg font-semibold text-slate-900 dark:text-slate-100">
+              <FontAwesomeIcon icon={faCode} className="text-indigo-600" />
+              {label}
             </div>
-          ))
-        )}
-      </div>
+            <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">{info}</p>
+          </NextLink>
+        ))}
+      </section>
     </main>
   );
 };
