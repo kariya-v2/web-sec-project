@@ -68,13 +68,12 @@
 
 ## 5. デモンストレーション
 
-以下の画面・挙動を確認してください。
-
 1. サインアップ画面: パスワード強度表示
 2. ログイン画面: 認証成功
 3. プロフィール画面: 認証済み情報表示
 4. 退会確認画面: 退会処理
-5. 開発者ツール: `HttpOnly` / `Secure` Cookie 属性確認
+
+[![動画のタイトル](https://img.youtube.com/vi/動画ID/0.jpg)](https://www.youtube.com/watch?v=KcNORTqldoM)
 
 ## 6. セットアップ手順
 
